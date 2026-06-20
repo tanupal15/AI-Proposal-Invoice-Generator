@@ -2,9 +2,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { signOut } = useAuth();
 
   const navItems = [
     { name: "DASHBOARD", path: "/", icon: "dashboard" },
@@ -22,7 +24,7 @@ export default function Sidebar() {
     }
   };
 
-  const itemVariants = {
+  const itemVariants: any = {
     hidden: { x: -30, opacity: 0 },
     show: { x: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 24 } }
   };
@@ -91,13 +93,13 @@ export default function Sidebar() {
             ONLINE / SYNCHED
           </div>
         </div>
-        <Link
-          href="/login"
-          className="bg-primary text-on-primary font-bold uppercase text-xs py-2 px-4 border-2 border-primary brutal-shadow-hover flex items-center justify-center gap-2 mt-2"
+        <button
+          onClick={() => signOut()}
+          className="bg-primary text-on-primary font-bold uppercase text-xs py-2 px-4 border-2 border-primary brutal-shadow-hover flex items-center justify-center gap-2 mt-2 cursor-pointer"
         >
           <span className="material-symbols-outlined text-sm">logout</span>
           LOGOUT
-        </Link>
+        </button>
       </div>
     </nav>
   );

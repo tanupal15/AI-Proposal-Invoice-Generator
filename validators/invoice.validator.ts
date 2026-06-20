@@ -8,7 +8,7 @@ import type { InvoiceInput, GeneratedInvoice } from '../types';
 export function validateInvoiceInput(data: unknown): InvoiceInput {
   const result = InvoiceInputSchema.safeParse(data);
   if (!result.success) {
-    throw new Error(`Invalid InvoiceInput: ${result.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`);
+    throw new Error(`Invalid InvoiceInput: ${result.error.message}`);
   }
   return result.data;
 }
@@ -20,7 +20,7 @@ export function validateInvoiceInput(data: unknown): InvoiceInput {
 export function validateInvoiceOutput(data: unknown): GeneratedInvoice {
   const result = GeneratedInvoiceSchema.safeParse(data);
   if (!result.success) {
-    throw new Error(`Invalid GeneratedInvoice AI Output: ${result.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`);
+    throw new Error(`Invalid GeneratedInvoice AI Output: ${result.error.message}`);
   }
   return result.data;
 }

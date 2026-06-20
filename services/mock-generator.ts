@@ -15,7 +15,7 @@ export function parsePromptContext(messages: ChatMessage[]) {
   const industry = industryMatch ? industryMatch[1].trim() : 'Technology';
 
   // Extract Services
-  const services: { name: string; category: string; basePrice: number }[] = [];
+  const services: { name: string; category: string; basePrice: number; estimatedHours?: number }[] = [];
   // Standard regex to find selected service blocks in context format
   const serviceRegex = /\d+\.\s*([^\r\n(]+)\(([^)]+)\)[\s\S]*?Base Price:\s*\$?([\d,]+)/g;
   let match;

@@ -5,7 +5,7 @@
 // with optional tiered pricing (Basic / Standard / Premium).
 // =============================================================================
 
-import type { QuotationInput, ChatMessage } from '../types';
+import type { QuotationInput, ChatMessage } from '../../types';
 import {
   buildBaseSystemPrompt,
   formatClientContext,

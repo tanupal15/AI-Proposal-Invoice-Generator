@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { useProposals, useAiGenerations } from "@/hooks/useSupabase";
+
 const containerVariants = {
   hidden: { opacity: 0 },
   show: {
@@ -16,13 +18,17 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: any = {
   hidden: { opacity: 0, y: 30 },
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
 };
 
 export default function NewProposalPage() {
   const router = useRouter();
+  const { createProposal } = useProposals();
+  const { createGeneration } = useAiGenerations();
+  const [clientName, setClientName] = useState("");
+  const [clientIndustry, setClientIndustry] = useState("");
   const [price, setPrice] = useState("");
   const [isCalculating, setIsCalculating] = useState(false);
   const [services, setServices] = useState({
@@ -51,8 +57,26 @@ export default function NewProposalPage() {
     }, 800);
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    const serviceList = Object.keys(services).filter((key) => services[key as keyof typeof services]);
+    
+    await createGeneration({
+      type: 'proposal',
+      input: { clientName, clientIndustry, services: serviceList, price },
+      status: 'pending',
+      model: 'gemini-1.5-pro'
+    });
+
+    await createProposal({
+      title: "DIGITAL TRANSFORMATION PACKAGE",
+      client_name: clientName || "Unknown Client",
+      client_industry: clientIndustry || "Unknown",
+      status: "DRAFT",
+      estimated_budget: parseInt(price) || 0,
+      services: serviceList,
+      content: { generated: false },
+    });
     router.push("/proposals/generating");
   };
 
@@ -93,6 +117,8 @@ export default function NewProposalPage() {
                   type="text"
                   required
                   placeholder="e.g. Acme Corp"
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value)}
                   className="w-full bg-transparent border-0 border-b-4 border-primary focus:ring-0 focus:border-secondary px-0 py-3 font-body font-bold text-xl text-primary rounded-none placeholder:text-on-surface-variant/50 transition-colors focus:outline-none"
                 />
               </div>
@@ -104,6 +130,8 @@ export default function NewProposalPage() {
                   type="text"
                   required
                   placeholder="e.g. Restaurant, SaaS"
+                  value={clientIndustry}
+                  onChange={(e) => setClientIndustry(e.target.value)}
                   className="w-full bg-transparent border-0 border-b-4 border-primary focus:ring-0 focus:border-secondary px-0 py-3 font-body font-bold text-xl text-primary rounded-none placeholder:text-on-surface-variant/50 transition-colors focus:outline-none"
                 />
               </div>

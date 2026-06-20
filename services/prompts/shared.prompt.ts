@@ -6,7 +6,7 @@
 // instructions that keep all prompts consistent.
 // =============================================================================
 
-import type { ClientInfo, ServiceItem } from '../types';
+import type { ClientInfo, ServiceItem } from '../../types';
 
 // -----------------------------------------------------------------------------
 // Base System Prompt

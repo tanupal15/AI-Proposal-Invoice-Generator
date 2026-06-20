@@ -8,7 +8,7 @@ import type { ScopeOfWorkInput, GeneratedScopeOfWork } from '../types';
 export function validateScopeOfWorkInput(data: unknown): ScopeOfWorkInput {
   const result = ScopeOfWorkInputSchema.safeParse(data);
   if (!result.success) {
-    throw new Error(`Invalid ScopeOfWorkInput: ${result.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`);
+    throw new Error(`Invalid ScopeOfWorkInput: ${result.error.message}`);
   }
   return result.data;
 }
@@ -20,7 +20,7 @@ export function validateScopeOfWorkInput(data: unknown): ScopeOfWorkInput {
 export function validateScopeOfWorkOutput(data: unknown): GeneratedScopeOfWork {
   const result = GeneratedScopeOfWorkSchema.safeParse(data);
   if (!result.success) {
-    throw new Error(`Invalid GeneratedScopeOfWork AI Output: ${result.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')}`);
+    throw new Error(`Invalid GeneratedScopeOfWork AI Output: ${result.error.message}`);
   }
   return result.data;
 }

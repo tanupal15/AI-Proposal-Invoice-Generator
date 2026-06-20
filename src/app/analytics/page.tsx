@@ -2,6 +2,7 @@
 import AppShell from "@/components/AppShell";
 import TopAppBar from "@/components/TopAppBar";
 import { motion } from "framer-motion";
+import { useAnalytics } from "@/hooks/useSupabase";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -11,20 +12,31 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: any = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
 };
 
 export default function AnalyticsPage() {
-  const revenueData = [
-    { month: "MAY", value: 45 },
-    { month: "JUN", value: 65 },
-    { month: "JUL", value: 30 },
-    { month: "AUG", value: 85 },
-    { month: "SEP", value: 55 },
-    { month: "OCT", value: 100 },
-  ];
+  const { analytics, loading } = useAnalytics();
+
+  if (loading) {
+    return (
+      <AppShell>
+        <TopAppBar title="PROPOSAL.AI" />
+        <div className="flex-1 flex items-center justify-center min-h-[50vh]">
+          <p className="font-headline font-black text-2xl animate-pulse">LOADING ANALYTICS...</p>
+        </div>
+      </AppShell>
+    );
+  }
+
+  const maxRevenue = Math.max(...(analytics.revenueByMonth.length ? analytics.revenueByMonth.map(d => d.value) : [1]));
+  const revenueData = analytics.revenueByMonth.map(d => ({
+    month: d.month,
+    value: d.value,
+    percentage: maxRevenue > 0 ? (d.value / maxRevenue) * 100 : 0
+  }));
 
   return (
     <AppShell>
@@ -59,11 +71,11 @@ export default function AnalyticsPage() {
             </h3>
             <div className="mt-4">
               <p className="text-5xl lg:text-6xl font-headline font-black tracking-tighter">
-                $214,500
+                ${analytics.totalRevenue.toLocaleString()}
               </p>
               <p className="text-sm font-bold mt-2 uppercase text-surface-variant flex items-center gap-1">
                 <span className="material-symbols-outlined text-sm">trending_up</span> 
-                +24% vs Last Year
+                +{analytics.revenueChange}% vs Last Year
               </p>
             </div>
           </motion.div>
@@ -78,11 +90,11 @@ export default function AnalyticsPage() {
             </h3>
             <div className="mt-4">
               <p className="text-5xl lg:text-6xl font-headline font-black tracking-tighter">
-                68%
+                {analytics.winRate}%
               </p>
               <p className="text-sm font-bold mt-2 uppercase flex items-center gap-1 opacity-80">
                 <span className="material-symbols-outlined text-sm">check_circle</span> 
-                17 of 25 won
+                {analytics.wonCount} of {analytics.totalProposals} won
               </p>
             </div>
           </motion.div>
@@ -97,11 +109,11 @@ export default function AnalyticsPage() {
             </h3>
             <div className="mt-4">
               <p className="text-5xl lg:text-6xl font-headline font-black tracking-tighter">
-                $12,617
+                ${analytics.avgDealSize.toLocaleString()}
               </p>
               <p className="text-sm font-bold mt-2 uppercase flex items-center gap-1 opacity-80">
                 <span className="material-symbols-outlined text-sm">payments</span> 
-                Highest: $45K
+                Highest: ${(analytics.highestDeal / 1000).toFixed(0)}K
               </p>
             </div>
           </motion.div>
@@ -124,12 +136,12 @@ export default function AnalyticsPage() {
                 <div key={index} className="flex-1 flex flex-col items-center group z-10 h-full justify-end">
                   <motion.div 
                     initial={{ height: "0%" }}
-                    animate={{ height: `${data.value}%` }}
+                    animate={{ height: `${data.percentage}%` }}
                     transition={{ duration: 0.8, delay: 0.2 + index * 0.1, ease: "easeOut" }}
                     className="w-full bg-primary border-4 border-primary group-hover:bg-secondary transition-colors relative cursor-pointer"
                   >
                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-surface border-2 border-primary px-2 py-1 text-xs font-bold font-headline hidden group-hover:block whitespace-nowrap text-primary">
-                      ${(data.value * 1000).toLocaleString()}
+                      ${data.value.toLocaleString()}
                     </div>
                   </motion.div>
                   <div className="mt-4 font-headline font-bold text-sm text-primary uppercase">

@@ -6,7 +6,7 @@
 // timeline, pricing table, and optional contract clauses / upsells.
 // =============================================================================
 
-import type { ProposalInput, ChatMessage } from '../types';
+import type { ProposalInput, ChatMessage } from '../../types';
 import {
   buildBaseSystemPrompt,
   formatClientContext,

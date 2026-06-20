@@ -3,6 +3,7 @@ import AppShell from "@/components/AppShell";
 import TopAppBar from "@/components/TopAppBar";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useDashboardStats } from "@/hooks/useSupabase";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -14,12 +15,25 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } },
+const itemVariants: any = {
+  hidden: { y: 20, opacity: 0 },
+  show: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 300, damping: 24 } }
 };
 
 export default function DashboardPage() {
+  const { stats, recentDocs, loading } = useDashboardStats();
+
+  if (loading) {
+    return (
+      <AppShell>
+        <TopAppBar title="PROPOSAL.AI" />
+        <div className="flex-1 flex items-center justify-center min-h-[50vh]">
+          <p className="font-headline font-black text-2xl animate-pulse">LOADING DASHBOARD...</p>
+        </div>
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell>
       <TopAppBar title="PROPOSAL.AI" />
@@ -62,10 +76,10 @@ export default function DashboardPage() {
             </div>
             <div className="mt-8">
               <p className="text-5xl lg:text-6xl font-headline font-black tracking-tighter">
-                $142,500
+                ${stats.totalValue.toLocaleString()}
               </p>
               <p className="text-sm font-bold mt-2 uppercase flex items-center gap-1 bg-surface-container px-2 py-1 inline-flex border border-primary">
-                <span className="material-symbols-outlined text-sm">trending_up</span> +12% vs last month
+                <span className="material-symbols-outlined text-sm">trending_up</span> +{stats.totalValueChange}% vs last month
               </p>
             </div>
           </motion.div>
@@ -86,10 +100,10 @@ export default function DashboardPage() {
             </div>
             <div className="mt-8">
               <p className="text-5xl lg:text-6xl font-headline font-black tracking-tighter text-on-primary">
-                18
+                {stats.activeProposals}
               </p>
               <p className="text-sm font-bold mt-2 uppercase text-surface-variant flex items-center gap-1">
-                <span className="material-symbols-outlined text-sm text-surface-variant">priority_high</span> 4 require attention
+                <span className="material-symbols-outlined text-sm text-surface-variant">priority_high</span> {stats.requireAttention} require attention
               </p>
             </div>
           </motion.div>
@@ -110,10 +124,10 @@ export default function DashboardPage() {
             </div>
             <div className="mt-8">
               <p className="text-5xl lg:text-6xl font-headline font-black tracking-tighter text-secondary">
-                7
+                {stats.pendingInvoices}
               </p>
               <p className="text-sm font-bold mt-2 uppercase flex items-center gap-1 bg-surface px-2 py-1 inline-flex border border-primary text-secondary">
-                <span className="material-symbols-outlined text-sm">warning</span> 2 OVERDUE
+                <span className="material-symbols-outlined text-sm">warning</span> {stats.overdueInvoices} OVERDUE
               </p>
             </div>
           </motion.div>
@@ -133,89 +147,62 @@ export default function DashboardPage() {
           </motion.div>
           
           <motion.div variants={containerVariants} className="space-y-4">
-            <motion.div
-              variants={itemVariants}
-              whileHover={{ scale: 1.01, x: 4 }}
-              className="bg-surface border-4 border-primary brutal-shadow-sm p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 group hover:bg-primary-container transition-colors duration-200 cursor-pointer text-primary"
-            >
-              <div className="flex items-center gap-4 w-full md:w-auto">
-                <div className="w-12 h-12 bg-primary text-on-primary flex items-center justify-center border-2 border-primary group-hover:bg-surface group-hover:text-primary transition-colors">
-                  <span className="material-symbols-outlined">description</span>
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-headline font-bold text-lg uppercase leading-tight">
-                    Acme Corp Redesign
-                  </h4>
-                  <p className="text-sm font-bold text-on-surface-variant">
-                    Client: Acme Corp • Due: Oct 30
-                  </p>
-                </div>
+            {recentDocs.length === 0 ? (
+              <div className="bg-surface border-4 border-primary p-8 text-center">
+                <p className="font-headline font-bold text-lg text-primary">NO RECENT DOCUMENTS FOUND</p>
               </div>
-              <div className="flex items-center justify-between w-full md:w-auto gap-6 md:gap-8 border-t-2 md:border-t-0 border-primary pt-2 md:pt-0">
-                <div className="text-left md:text-right">
-                  <p className="font-headline font-black text-xl">$45,000</p>
-                </div>
-                <span className="bg-surface border-2 border-primary px-3 py-1 text-xs font-bold uppercase tracking-wider">
-                  DRAFT
-                </span>
-              </div>
-            </motion.div>
-
-            <motion.div
-              variants={itemVariants}
-              whileHover={{ scale: 1.01, x: 4 }}
-              className="bg-surface border-4 border-primary brutal-shadow-sm p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 group hover:bg-tertiary-container transition-colors duration-200 cursor-pointer text-primary"
-            >
-              <div className="flex items-center gap-4 w-full md:w-auto">
-                <div className="w-12 h-12 bg-tertiary text-on-primary flex items-center justify-center border-2 border-primary">
-                  <span className="material-symbols-outlined">send</span>
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-headline font-bold text-lg uppercase leading-tight">
-                    Q3 Marketing Campaign
-                  </h4>
-                  <p className="text-sm font-bold text-on-surface-variant">
-                    Client: Globex • Sent: Oct 20
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between w-full md:w-auto gap-6 md:gap-8 border-t-2 md:border-t-0 border-primary pt-2 md:pt-0">
-                <div className="text-left md:text-right">
-                  <p className="font-headline font-black text-xl">$12,500</p>
-                </div>
-                <span className="bg-tertiary text-on-primary border-2 border-primary px-3 py-1 text-xs font-bold uppercase tracking-wider">
-                  SENT
-                </span>
-              </div>
-            </motion.div>
-
-            <motion.div
-              variants={itemVariants}
-              whileHover={{ scale: 1.01, x: 4 }}
-              className="bg-surface border-4 border-primary brutal-shadow-sm p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 group hover:bg-surface-dim transition-colors duration-200 cursor-pointer text-primary"
-            >
-              <div className="flex items-center gap-4 w-full md:w-auto">
-                <div className="w-12 h-12 bg-surface-container-highest border-2 border-primary flex items-center justify-center">
-                  <span className="material-symbols-outlined">check_circle</span>
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-headline font-bold text-lg uppercase leading-tight">
-                    Server Infrastructure Update
-                  </h4>
-                  <p className="text-sm font-bold text-on-surface-variant">
-                    Client: Initech • Paid: Oct 15
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between w-full md:w-auto gap-6 md:gap-8 border-t-2 md:border-t-0 border-primary pt-2 md:pt-0">
-                <div className="text-left md:text-right">
-                  <p className="font-headline font-black text-xl">$8,200</p>
-                </div>
-                <span className="bg-surface border-2 border-primary px-3 py-1 text-xs font-bold uppercase tracking-wider opacity-60">
-                  PAID
-                </span>
-              </div>
-            </motion.div>
+            ) : (
+              recentDocs.map((doc) => (
+                <motion.div
+                  key={doc.id}
+                  variants={itemVariants}
+                  whileHover={{ scale: 1.01, x: 4 }}
+                  className={`bg-surface border-4 border-primary brutal-shadow-sm p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 group transition-colors duration-200 cursor-pointer text-primary ${
+                    doc.type === "proposal"
+                      ? "hover:bg-primary-container"
+                      : "hover:bg-tertiary-container"
+                  }`}
+                >
+                  <div className="flex items-center gap-4 w-full md:w-auto">
+                    <div
+                      className={`w-12 h-12 flex items-center justify-center border-2 border-primary ${
+                        doc.type === "proposal"
+                          ? "bg-primary text-on-primary group-hover:bg-surface group-hover:text-primary transition-colors"
+                          : "bg-tertiary text-on-primary group-hover:bg-surface group-hover:text-tertiary transition-colors"
+                      }`}
+                    >
+                      <span className="material-symbols-outlined">
+                        {doc.type === "proposal" ? "description" : "receipt_long"}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-headline font-bold text-lg uppercase leading-tight">
+                        {doc.title}
+                      </h4>
+                      <p className="text-sm font-bold text-on-surface-variant">
+                        Client: {doc.client} • Date: {new Date(doc.date).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between w-full md:w-auto gap-6 md:gap-8 border-t-2 md:border-t-0 border-primary pt-2 md:pt-0">
+                    <div className="text-left md:text-right">
+                      <p className="font-headline font-black text-xl">${doc.amount.toLocaleString()}</p>
+                    </div>
+                    <span
+                      className={`border-2 border-primary px-3 py-1 text-xs font-bold uppercase tracking-wider ${
+                        doc.status === "PAID" || doc.status === "ACCEPTED"
+                          ? "bg-surface opacity-60"
+                          : doc.status === "SENT"
+                          ? "bg-tertiary text-on-primary"
+                          : "bg-surface"
+                      }`}
+                    >
+                      {doc.status}
+                    </span>
+                  </div>
+                </motion.div>
+              ))
+            )}
           </motion.div>
         </motion.section>
 

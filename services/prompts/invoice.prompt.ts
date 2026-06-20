@@ -5,7 +5,7 @@
 // line item enhancement, payment terms, and tax calculations.
 // =============================================================================
 
-import type { InvoiceInput, ChatMessage } from '../types';
+import type { InvoiceInput, ChatMessage } from '../../types';
 import {
   buildBaseSystemPrompt,
   formatClientContext,

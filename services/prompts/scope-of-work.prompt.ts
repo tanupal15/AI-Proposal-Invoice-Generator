@@ -5,7 +5,7 @@
 // with phases, deliverables, acceptance criteria, and project governance.
 // =============================================================================
 
-import type { ScopeOfWorkInput, ChatMessage } from '../types';
+import type { ScopeOfWorkInput, ChatMessage } from '../../types';
 import {
   buildBaseSystemPrompt,
   formatClientContext,
